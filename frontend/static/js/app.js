@@ -26,52 +26,91 @@
       name: n.name || n.id,
       symbolSize: 8 + (n.value || 8),
       category: categoriesArr.indexOf(n.discipline || '其他'),
-      value: n.value || 1
+      value: n.value || 1,
+      description: n.description
     }));
     const links = (data.links || []).map(l => ({
       source: l.source,
       target: l.target,
-      label: { show: true, formatter: l.relation || '' }
+      sourceName: l.sourseName,
+      targetName: l.targetName,
+      label: { show: true, formatter: l.relation || '' },
+      description: l.description
     }));
-
-    // const option = {
-    //   tooltip: { formatter: params => params.data.name || params.data.id },
-    //   legend: [{ data: categoriesArr }],
-    //   series: [{
-    //     type: 'graph',
-    //     layout: 'force',
-    //     roam: true,
-    //     draggable: true,
-    //     data: nodes,
-    //     links: links,
-    //     categories,
-    //     emphasis: { focus: 'adjacency' },
-    //     force: { repulsion: 280, edgeLength: [60, 140] },
-    //     label: { position: 'right' }
-    //   }]
-    // };
-
-    const option = {
+    const option = { 
       tooltip: { 
-      // 重构formatter：显示name + 额外描述
-      formatter: (params) => {
-        // 基础名称/ID
-        const baseInfo = params.data.name || params.data.id;
-        // 额外描述（有则显示，无则提示“无描述”）
-        const descInfo = params.data.description 
-          ? `<br/><br/>📝 描述：${params.data.description}` 
-          : "<br/><br/>📝 描述：暂无";
-        // 拼接返回
-        return baseInfo + descInfo;
+        trigger: 'item',
+        triggerOn: 'mousemove',
+        position: function (point, params, dom, rect, size) {
+          const tooltipWidth = size.viewSize[0] * 0.25;
+          let x = point[0] - tooltipWidth / 2;
+          x = Math.max(x, 10);
+          x = Math.min(x, size.viewSize[0] - tooltipWidth - 10);
+          let y = point[1] + 10;
+          y = Math.min(y, size.viewSize[1] - dom.offsetHeight - 10);
+          return [x, y];
+        },
+        extraCssText: `
+          width: 25vw !important;
+          max-width: 25vw !important;
+          min-width: 25vw !important; /* 新增：强制宽度固定 */
+          transform: translateX(0) !important;
+          box-sizing: border-box !important;
+          padding: 12px 15px !important;
+          text-align: left !important;
+          line-height: 1.5 !important;
+          word-break: break-all !important;
+          overflow: hidden !important; /* 新增：隐藏溢出内容（兜底） */
+          display: block !important; /* 强制块级元素 */
+        `,
+        formatter: (params) => {
+          const textContainerStyle = `
+            style="
+              width: 100% !important; 
+              word-break: break-all !important; 
+              white-space: normal !important; 
+              line-height: 1.5 !important;
+              font-size: 16px !important;
+              font-weight: bold !important;
+              color: #ffffff !important;
+            "
+          `;
+
+          if (params.dataType === 'node') {
+            const baseInfo = params.data.name || params.data.id;
+            const desc = params.data.description || '暂无';
+            return `
+              <div ${textContainerStyle}>
+                ${baseInfo}
+                <br/><br/>📝 描述：${desc}
+              </div>
+            `;
+          } else if (params.dataType === 'edge') {
+            const baseInfo = `${params.data.sourceName} → ${params.data.targetName}`;
+            const desc = params.data.description || '暂无';
+            return `
+              <div ${textContainerStyle}>
+                ${baseInfo}
+                <br/><br/>📝 关系描述：${desc}
+              </div>
+            `;
+          }
+          return `<div ${textContainerStyle}>${params.name || '暂无信息'}</div>`;
+        },
+        textStyle: { 
+          color: '#ffffff',
+          fontSize: 16,
+          fontWeight: 'bold',
+          whiteSpace: 'normal',
+          wordWrap: 'break-word',
+          wordBreak: 'break-all'
+        },
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        borderColor: '#ffffff',
+        borderWidth: 1,
+        padding: 0, 
+        useHtml: true 
       },
-      textStyle: { 
-        color: '#ffffff',
-        fontSize: 16,
-        fontWeight: 'bold'
-      },
-      backgroundColor: 'rgba(0,0,0,0.7)',
-      borderColor: '#ffffff'
-    },
       legend: [{ 
         data: categoriesArr,
         textStyle: { 
@@ -95,17 +134,13 @@
             fontSize: 20,
             fontWeight: 'bold'
           },
-          // 悬浮时节点进一步放大
           itemStyle: { symbolSize: 60 },
-          // 悬浮时边进一步加粗
           lineStyle: { width: 6 }
         },
-        // 力导向参数适配：放大后节点不重叠
         force: { 
-          repulsion: 450,    // 节点排斥力增大（默认280→450）
-          edgeLength: [100, 180] // 边长度加长（默认60-140→100-180）
+          repulsion: 450,    
+          edgeLength: [100, 180] 
         },
-        // 节点核心样式：放大+白色文字+加粗
         label: { 
           position: 'right',
           color: '#ffffff',
@@ -113,19 +148,16 @@
           fontWeight: 'bold',
           fontFamily: 'Arial'
         },
-        // 节点大小（核心放大配置）
-        symbolSize: 50, // 节点默认大小（默认10→50，可按需调40/60）
-        // 节点样式（可选：加边框，更醒目）
+        symbolSize: 50, 
         itemStyle: { 
-          borderColor: '#ffffff', // 节点边框白色
-          borderWidth: 2,         // 边框宽度
-          opacity: 0.8            // 透明度，避免太厚重
+          borderColor: '#ffffff', 
+          borderWidth: 2,         
+          opacity: 0.8            
         },
-        // 边的样式：加粗放大
         lineStyle: { 
-          width: 4,        // 边宽度（默认1→4，可按需调3/5）
-          color: '#ffffff',// 边颜色设为白色（和文字匹配）
-          opacity: 0.7     // 边透明度，避免抢焦点
+          width: 4,        
+          color: '#ffffff',
+          opacity: 0.7     
         },
         category: {
           label: { 
@@ -141,6 +173,7 @@
         }
       }]
     };
+  
     myChart.setOption(option);
 
     myChart.off('click');
@@ -189,7 +222,7 @@
     setInfo(`查询「${concept}」中...`);
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(()=>controller.abort(), 60000);
+      const timeout = setTimeout(()=>controller.abort(), 120000);
       const res = await fetch(`/api/graph`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
