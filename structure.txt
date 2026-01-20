@@ -1,0 +1,21 @@
+InterKnow_Graph_Agent/   # 项目根目录（操作目录）
+├── backend/             # 后端
+│   ├── models/          # 具体功能
+│   │   └── .py        
+│   └── routing/         # 路由
+│       └── router.py    # 路由总线    
+├── frontend/            # 前端
+│   ├── static/          # 静态文件（即所有非html文件）
+│   │   ├── css/             # 存放所有css
+│   │   ├── js/              # 存放不是js库的js文件
+│   │   ├── js_lib/          # 存放所有本地js库
+│   │   └── video/           # 存放视频
+│   └── templates/       # 存放所有HTML页面
+│       └── index.html   # 主界面
+├── test/                # 测试
+│   ├── dump_graph.py    # 测试是否能生成图文档
+│   └── healthcheck.py   # 测试是否能连接LLM
+├── main.py              # 项目入口
+├── README.md            # 项目说明
+├── requirements.txt     # 项目依赖        
+└── structure.txt        # 项目结构    
