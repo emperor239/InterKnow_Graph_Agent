@@ -78,7 +78,7 @@ async def build_graph(request: Request):
             links.append({"source":link["source"],"target":link["target"],"relation":link["relation"]})
         graph={"nodes":nodes, "links":links}
         print(graph)
-        return 0
+        return graph
 
     except Exception as e:
         return {"error": str(e), "nodes": [], "links": []}
