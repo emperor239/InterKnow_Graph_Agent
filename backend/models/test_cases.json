@@ -1,0 +1,37 @@
+{
+  "entropy": {
+    "concept": "熵",
+    "nodes_count": 10,
+    "links_count": 8,
+    "cross_disciplines": ["数学", "物理学", "计算机科学", "生物学", "哲学/社会科学"],
+    "status": "success"
+  },
+  "neural_network": {
+    "concept": "神经网络",
+    "nodes_count": 12,
+    "links_count": 13,
+    "cross_disciplines": ["数学", "计算机科学", "生物学"],
+    "status": "success"
+  },
+  "least_squares": {
+    "concept": "最小二乘法",
+    "nodes_count": 14,
+    "links_count": 13,
+    "cross_disciplines": ["数学", "统计学", "计算机科学"],
+    "status": "success"
+  },
+  "gradient_descent": {
+    "concept": "梯度下降",
+    "nodes_count": 12,
+    "links_count": 13,
+    "cross_disciplines": ["数学", "优化理论", "机器学习"],
+    "status": "success"
+  },
+  "bayes_theorem": {
+    "concept": "贝叶斯定理",
+    "nodes_count": 15,
+    "links_count": 15,
+    "cross_disciplines": ["数学", "统计学", "计算机科学", "认知科学"],
+    "status": "success"
+  }
+}

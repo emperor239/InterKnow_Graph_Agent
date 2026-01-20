@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import Response
-
+from backend.models.llm_graph_builder import build_knowledge_graph
 
 router = FastAPI()
 templates = Jinja2Templates(directory="frontend/templates")
@@ -39,6 +39,20 @@ async def subtract_numbers(request: Request):
     except Exception as e:
         return {"error": str(e)}, 400
 
+@router.post("/api/graph")
+async def build_graph(request: Request):
+    try:
+        data = await request.json()
+        concept = (data.get("concept") or "").strip()
+
+        if not concept:
+            return {"error": "empty concept", "nodes": [], "links": []}
+
+        graph = build_knowledge_graph(concept)
+        return graph
+
+    except Exception as e:
+        return {"error": str(e), "nodes": [], "links": []}
 
 # 页面路由
 @router.get("/index.html", response_class=HTMLResponse)
