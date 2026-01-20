@@ -1,0 +1,23 @@
+{
+  "nodes": [
+    {"id":"熵","name":"熵","discipline":"物理","value":20},
+    {"id":"信息论_熵","name":"信息论（熵）","discipline":"数学","value":14},
+    {"id":"热力学_熵","name":"热力学（熵）","discipline":"物理","value":12},
+    {"id":"最小二乘","name":"最小二乘法","discipline":"数学","value":16},
+    {"id":"神经网络","name":"神经网络","discipline":"计算机","value":18},
+    {"id":"进化生物学","name":"进化生物学","discipline":"生物","value":10},
+    {"id":"统计学习","name":"统计学习","discipline":"数学","value":13},
+    {"id":"交互信息","name":"交互信息","discipline":"信息论","value":9},
+    {"id":"社会熵","name":"社会学中的熵概念","discipline":"社会学","value":7}
+  ],
+  "links": [
+    {"source":"熵","target":"信息论_熵","relation":"定义相关"},
+    {"source":"熵","target":"热力学_熵","relation":"起源"},
+    {"source":"信息论_熵","target":"统计学习","relation":"度量不确定性"},
+    {"source":"统计学习","target":"最小二乘","relation":"优化方法"},
+    {"source":"神经网络","target":"最小二乘","relation":"训练/损失"},
+    {"source":"进化生物学","target":"神经网络","relation":"启发/类比"},
+    {"source":"信息论_熵","target":"交互信息","relation":"拓展"},
+    {"source":"社会熵","target":"信息论_熵","relation":"比喻/借用"}
+  ]
+}

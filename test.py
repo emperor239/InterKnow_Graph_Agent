@@ -1,0 +1,34 @@
+import json
+
+# 原始JSON数据
+original_data = {
+  "nodes": [
+    {"id": "p1", "name": "热力学熵", "category": "物理学", "discipline": "物理", "value": 1},
+    {"id": "p2", "name": "熵增定律", "category": "物理学", "discipline": "物理", "value": 1},
+    {"id": "m1", "name": "香农熵", "category": "数学", "discipline": "数学", "value": 3},
+    {"id": "m2", "name": "相对熵", "category": "数学", "discipline": "数学", "value": 1},
+    {"id": "c1", "name": "熵编码", "category": "计算机科学", "discipline": "计算机", "value": 1},
+    {"id": "c2", "name": "特征选择", "category": "计算机科学", "discipline": "计算机", "value": 2},
+    {"id": "b1", "name": "生物熵", "category": "生物学", "discipline": "生物", "value": 1},
+    {"id": "b2", "name": "耗散结构", "category": "生物学", "discipline": "生物", "value": 1},
+    {"id": "s1", "name": "社会熵", "category": "哲学/社会科学", "discipline": "社会学", "value": 2},
+    {"id": "s2", "name": "熵增哲学", "category": "哲学/社会科学", "discipline": "社会学", "value": 1}
+  ],
+  "links": [
+    {"source": "m1", "target": "c1", "relation": "提供理论基础", "label": "提供理论基础", "name": "提供理论基础", "relation_short": "提供理论基础", "edge_label": "提供理论基础"},
+    {"source": "m1", "target": "c2", "relation": "用于特征选择", "label": "用于特征选择", "name": "用于特征选择", "relation_short": "用于特征选择", "edge_label": "用于特征选择"},
+    {"source": "p2", "target": "s1", "relation": "类比推导来源", "label": "类比推导来源", "name": "类比推导来源", "relation_short": "类比推导来源", "edge_label": "类比推导来源"},
+    {"source": "m1", "target": "s1", "relation": "类比度量无序程度", "label": "类比度量无序程度", "name": "类比度量无序程度", "relation_short": "类比度量无序程度", "edge_label": "类比度量无序程度"},
+    {"source": "m2", "target": "c2", "relation": "用于差异度量", "label": "用于差异度量", "name": "用于差异度量", "relation_short": "用于差异度量", "edge_label": "用于差异度量"}
+  ],
+  "warnings": ["content_check: filtered 4 low-quality relations"]
+}
+
+nodes=[]
+links=[]
+for node in original_data["nodes"]:
+    nodes.append({"id":node["id"],"name":node["name"],"discipline":node["discipline"],"value":node["value"]})
+print(nodes)
+for link in original_data["links"]:
+    links.append({"source":link["source"],"target":link["target"],"relation":link["relation"]})
+print(links)
