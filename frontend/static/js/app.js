@@ -222,7 +222,7 @@
     setInfo(`查询「${concept}」中...`);
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(()=>controller.abort(), 120000);
+      const timeout = setTimeout(()=>controller.abort(), 300000);
       const res = await fetch(`/api/graph`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

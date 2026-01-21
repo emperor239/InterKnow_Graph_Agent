@@ -20,7 +20,7 @@ const categories2 = (function () {
     let res = [];
     let len = 10;
     while (len--) {
-        res.push(10 - len - 1);
+        res.push(0);
     }
     return res;
 })();
@@ -29,7 +29,7 @@ const data = (function () {
     let res = [];
     let len = 10;
     while (len--) {
-        res.push(Math.round(Math.random() * 1000));
+        res.push(0);
     }
     return res;
 })();
@@ -44,81 +44,6 @@ const data2 = (function () {
     return res;
 })();
 
-// ECharts配置项
-// option = {
-//     title: {
-//         text: 'Dynamic Data（动态数据图表）'
-//     },
-//     tooltip: {
-//         trigger: 'axis',
-//         axisPointer: {
-//             type: 'cross',
-//             label: {
-//                 backgroundColor: '#ffffff'
-//             }
-//         }
-//     },
-//     legend: {},
-//     toolbox: {
-//         show: true,
-//         feature: {
-//             dataView: { readOnly: false },
-//             restore: {},
-//             saveAsImage: {}
-//         }
-//     },
-//     dataZoom: {
-//         show: false,
-//         start: 0,
-//         end: 100
-//     },
-//     xAxis: [
-//         {
-//             type: 'category',
-//             boundaryGap: true,
-//             data: categories
-//         },
-//         {
-//             type: 'category',
-//             boundaryGap: true,
-//             data: categories2
-//         }
-//     ],
-//     yAxis: [
-//         {
-//             type: 'value',
-//             scale: true,
-//             name: 'Price（价格）',
-//             max: 30,
-//             min: 0,
-//             boundaryGap: [0.2, 0.2]
-//         },
-//         {
-//             type: 'value',
-//             scale: true,
-//             name: 'Order（订单量）',
-//             max: 1200,
-//             min: 0,
-//             boundaryGap: [0.2, 0.2]
-//         }
-//     ],
-//     series: [
-//         {
-//             name: 'Dynamic Bar（动态柱状图）',
-//             type: 'bar',
-//             xAxisIndex: 1,
-//             yAxisIndex: 1,
-//             data: data
-//         },
-//         {
-//             name: 'Dynamic Line（动态折线图）',
-//             type: 'line',
-//             data: data2
-//         }
-//     ]
-// };
-
-
 option = {
     tooltip: {
         trigger: 'axis',
@@ -126,17 +51,17 @@ option = {
             type: 'cross',
             label: {
                 backgroundColor: '#0e85a9',
-                color: '#ffffff' // 提示框标签文字黑色（白色背景更清晰）
+                color: '#ffffff'
             }
         },
-        textStyle: { color: '#000000' } // 提示框内容文字白色
+        textStyle: { color: '#000000' }
     },
     legend: {
-        textStyle: { color: '#ffffff' } // 图例文字白色
+        textStyle: { color: '#ffffff' }
     },
     toolbox: {
         show: true,
-        iconStyle: { color: '#ffffff' }, // 工具箱图标白色
+        iconStyle: { color: '#ffffff' },
         feature: {
             dataView: { readOnly: false, textStyle: { color: '#ffffff' } },
             restore: { textStyle: { color: '#ffffff' } },
@@ -153,17 +78,15 @@ option = {
             type: 'category',
             boundaryGap: true,
             data: categories,
-            // X轴基础样式（白色）
-            axisLine: { lineStyle: { color: '#ffffff' } }, // X轴线颜色
-            axisTick: { lineStyle: { color: '#ffffff' } }, // X轴刻度线颜色
-            axisLabel: { color: '#ffffff' }, // X轴标签文字颜色
-            splitLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } } // X轴分割线（浅白，避免刺眼）
+            axisLine: { lineStyle: { color: '#ffffff' } },
+            axisTick: { lineStyle: { color: '#ffffff' } },
+            axisLabel: { color: '#ffffff' },
+            splitLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } }
         },
         {
             type: 'category',
             boundaryGap: true,
             data: categories2,
-            // 第二个X轴同样设为白色
             axisLine: { lineStyle: { color: '#ffffff' } },
             axisTick: { lineStyle: { color: '#ffffff' } },
             axisLabel: { color: '#ffffff' },
@@ -173,26 +96,20 @@ option = {
     yAxis: [
         {
             type: 'value',
-            scale: true,
-            name: 'Price（价格）',
-            max: 30,
-            min: 0,
-            boundaryGap: [0.2, 0.2],
-            // Y轴基础样式（白色）
-            axisLine: { lineStyle: { color: '#ffffff' } }, // Y轴线颜色
-            axisTick: { lineStyle: { color: '#ffffff' } }, // Y轴刻度线颜色
-            axisLabel: { color: '#ffffff' }, // Y轴标签文字颜色
-            splitLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } }, // Y轴分割线（浅白）
-            nameTextStyle: { color: '#ffffff' } // Y轴名称文字白色
+            scale: false, 
+            name: 'tokens量',
+            boundaryGap: [0.1, 0.1], 
+            axisLine: { lineStyle: { color: '#ffffff' } },
+            axisTick: { lineStyle: { color: '#ffffff' } },
+            axisLabel: { color: '#ffffff' },
+            splitLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
+            nameTextStyle: { color: '#ffffff' }
         },
         {
             type: 'value',
-            scale: true,
-            name: 'Order（订单量）',
-            max: 1200,
-            min: 0,
-            boundaryGap: [0.2, 0.2],
-            // 第二个Y轴同样设为白色
+            scale: false, 
+            name: '访问量',
+            boundaryGap: [0.1, 0.1],
             axisLine: { lineStyle: { color: '#ffffff' } },
             axisTick: { lineStyle: { color: '#ffffff' } },
             axisLabel: { color: '#ffffff' },
@@ -202,33 +119,41 @@ option = {
     ],
     series: [
         {
-            name: 'Dynamic Bar（动态柱状图）',
+            name: '处理的访问次数(单位：次)',
             type: 'bar',
             xAxisIndex: 1,
             yAxisIndex: 1,
             data: data,
-            itemStyle: { color: 'rgba(15, 176, 163, 0.8)' } // 柱状图柱子浅白（适配深色背景）
+            itemStyle: { color: 'rgba(15, 176, 163, 0.8)' }
         },
         {
-            name: 'Dynamic Line（动态折线图）',
+            name: '处理的tokens量(单位：1000tokens)',
             type: 'line',
             data: data2,
-            lineStyle: { color: '#054f25' }, // 折线颜色白色
-            itemStyle: { color: '#0db851' }, // 折点颜色白色
-            areaStyle: { color: 'rgba(255,255,255,0.2)' } // 折线面积填充（浅白）
+            lineStyle: { color: '#054f25' },
+            itemStyle: { color: '#0db851' },
+            areaStyle: { color: 'rgba(255,255,255,0.2)' }
         }
     ],
 };
 
+
 // 定时更新数据（每2.1秒刷新一次）
 app.count = 11;
-setInterval(function () {
+setInterval(async function () {
     let axisData = new Date().toLocaleTimeString().replace(/^\D*/, '');
     // 移除第一个数据，新增随机数据（保持10个数据点）
+    res = await fetch(`/api/counts_and_tokens`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+    });
+    const result = await res.json();
+    console.log(result);
     data.shift();
-    data.push(Math.round(Math.random() * 1000));
+    data.push(result.total_counts);
     data2.shift();
-    data2.push(+(Math.random() * 10 + 5).toFixed(1));
+    data2.push(result.total_tokens);
     categories.shift();
     categories.push(axisData);
     categories2.shift();
