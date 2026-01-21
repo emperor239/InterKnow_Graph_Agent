@@ -42,7 +42,7 @@ if __name__ == "__main__":
     threading.Thread(target=simulation_other_users, daemon=True).start()
     uvicorn.run(
         "backend.routing.router:app",
-        host="127.0.0.1",
+        host="0.0.0.0",
         port=8000,
         workers=2
     )

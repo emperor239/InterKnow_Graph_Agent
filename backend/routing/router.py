@@ -8,6 +8,7 @@ from backend.models.bloom_filter import BloomFilter
 from pymongo import MongoClient    
 import asyncio
 import os
+import time
 
 app = FastAPI()
 mongodb_client = None
@@ -72,6 +73,8 @@ async def build_graph(request: Request):
 
         global bf
 
+        print("start")
+        start = time.time()
         if bf.contains(concept):
             doct = dict(await asyncio.to_thread(
                 lambda: users_col.find_one({"concept": concept}, {"_id": 0})  
@@ -82,6 +85,9 @@ async def build_graph(request: Request):
             original_data = await asyncio.to_thread(build_knowledge_graph, concept)
             await asyncio.to_thread(users_col.insert_one, {"concept": concept, "graph": original_data})
             bf.add(concept)
+        end = time.time()
+        print("end")
+        print(f"{end-start}")
         
         await asyncio.to_thread(
             users_col.update_one, 
