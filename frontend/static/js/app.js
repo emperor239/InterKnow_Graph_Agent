@@ -24,17 +24,16 @@
     const nodes = (data.nodes || []).map(n => ({
       id: n.id,
       name: n.name || n.id,
-      symbolSize: 8 + (n.value || 8),
+      symbolSize: Math.max(10, Math.min(38, 10 + (n.value || 1) * 2)),
       category: categoriesArr.indexOf(n.discipline || '其他'),
+      discipline: n.discipline || '其他',
       value: n.value || 1,
       description: n.description
     }));
     const links = (data.links || []).map(l => ({
       source: l.source,
       target: l.target,
-      sourceName: l.sourseName,
-      targetName: l.targetName,
-      label: { show: true, formatter: l.relation || '' },
+      relation: l.relation || '',
       description: l.description
     }));
     const option = { 
@@ -86,11 +85,11 @@
               </div>
             `;
           } else if (params.dataType === 'edge') {
-            const baseInfo = `${params.data.sourceName} → ${params.data.targetName}`;
+            const { source, target, description } = params.data;
             const desc = params.data.description || '暂无';
             return `
               <div ${textContainerStyle}>
-                ${baseInfo}
+                <b>${source} → ${target}</b>
                 <br/><br/>📝 关系描述：${desc}
               </div>
             `;
@@ -127,37 +126,36 @@
         data: nodes,
         links: links,
         categories,
-        emphasis: { 
-          focus: 'adjacency',
-          label: { 
-            color: '#ffffff',
-            fontSize: 20,
-            fontWeight: 'bold'
-          },
-          itemStyle: { symbolSize: 60 },
-          lineStyle: { width: 6 }
-        },
         force: { 
-          repulsion: 450,    
-          edgeLength: [100, 180] 
+          repulsion: 1300,
+          edgeLength: [120, 220],
+          gravity: 0.06,
+          friction: 0.6
         },
-        label: { 
-          position: 'right',
-          color: '#ffffff',
-          fontSize: 18,
-          fontWeight: 'bold',
-          fontFamily: 'Arial'
+        label: {
+          show: true,
+          position: 'inside',
+          color: '#e8f3ee',
+          fontSize: 12,
+          backgroundColor: 'rgba(0,0,0,0)',
+          padding: 0,
+          formatter: (p) => p.data.name || p.data.id || ''
         },
-        symbolSize: 50, 
+        emphasis: {
+          focus: 'adjacency',
+          scale: true,
+          label: { show: true, fontSize: 16, fontWeight: 'bold' },
+          lineStyle: { width: 2.5, opacity: 0.85 }
+        },
         itemStyle: { 
-          borderColor: '#ffffff', 
-          borderWidth: 2,         
-          opacity: 0.8            
+          borderColor: 'rgba(255,255,255,0.35)',
+          borderWidth: 1,      
+          opacity: 0.9           
         },
         lineStyle: { 
-          width: 4,        
-          color: '#ffffff',
-          opacity: 0.7     
+          width: 1.2,   
+          opacity: 0.35,
+          curveness: 0.20
         },
         category: {
           label: { 
@@ -167,14 +165,38 @@
           }
         },
         edgeLabel: {
-          color: '#ffffff',
-          fontSize: 14,
-          fontWeight: 'bold'
-        }
+          show: true,
+          formatter: (p) => p.data?.relation || '',
+          fontSize: 10,
+          color: 'rgba(232,243,238,0.55)',
+          backgroundColor: 'transparent',
+          padding: 0,
+        },
+        edgeSymbol: ['none', 'arrow'],
+        edgeSymbolSize: 6,
       }]
     };
   
     myChart.setOption(option);
+    // 根据缩放动态调字（不隐藏，只缩放）
+    myChart.off('graphRoam');
+    myChart.on('graphRoam', (params) => {
+      const zoom = params.zoom ?? 1;
+
+      const nodeBase = 12;
+      const edgeBase = 11;
+
+      // 按 zoom 缩放字号，限制范围，避免太大或太小
+      const nodeFont = Math.max(9, Math.min(16, Math.round(nodeBase * zoom)));
+      const edgeFont = Math.max(8, Math.min(14, Math.round(edgeBase * zoom)));
+
+      myChart.setOption({
+        series: [{
+          label: { fontSize: nodeFont, distance: Math.max(4, Math.round(6 * zoom)) },
+          edgeLabel: { fontSize: edgeFont }
+        }]
+      }, { notMerge: false, lazyUpdate: true });
+    });
 
     myChart.off('click');
     myChart.on('click', params => {
@@ -191,14 +213,17 @@
     title.textContent = node.name || node.id;
     panel.appendChild(title);
     const details = document.createElement('div');
-    details.innerHTML = `<b>ID:</b> ${node.id || ''}<br/><b>学科:</b> ${node.category || ''}<br/><b>值:</b> ${node.value || ''}`;
+    details.innerHTML =
+      `<b>ID:</b> ${node.id || ''}<br/>` +
+      `<b>学科:</b> ${node.discipline || ''}<br/>` +
+      `<b>值:</b> ${node.value || ''}`;
     panel.appendChild(details);
   }
 
   async function loadSample() {
     try {
       setInfo('正在加载本地样例...');
-      const res = await fetch('/frontend/static/json/sample_data.json');
+      const res = await fetch('../static/json/sample_data.json');
       if (!res.ok) throw new Error('样例文件未找到');
       const data = await res.json();
       renderGraph(data);
