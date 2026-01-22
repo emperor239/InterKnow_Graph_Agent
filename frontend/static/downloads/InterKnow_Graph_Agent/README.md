@@ -2,16 +2,13 @@
 云计算大作业都在这里
 
 
-cd /home/damn/InterKnow_Graph_Agent-main9.0/InterKnow_Graph_Agent-main9.0
-
 docker build -t interknow_graph_agent .
 
 docker run -p 8000:8000 interknow_graph_agent
 
 http://127.0.0.1:8000/graph.html
 
-docker stop interknow_graph_agent
-docker rm interknow_graph_agent
+
 
 ## 1. 项目概览
 InterKnow Graph Agent——跨学科知识图谱智能体。
