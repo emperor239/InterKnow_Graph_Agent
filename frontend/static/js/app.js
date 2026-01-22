@@ -24,16 +24,17 @@
     const nodes = (data.nodes || []).map(n => ({
       id: n.id,
       name: n.name || n.id,
-      symbolSize: Math.max(10, Math.min(38, 10 + (n.value || 1) * 2)),
+      symbolSize: 8 + (n.value || 8),
       category: categoriesArr.indexOf(n.discipline || '其他'),
-      discipline: n.discipline || '其他',
       value: n.value || 1,
       description: n.description
     }));
     const links = (data.links || []).map(l => ({
       source: l.source,
       target: l.target,
-      relation: l.relation || '',
+      sourceName: l.sourseName,
+      targetName: l.targetName,
+      label: { show: true, formatter: l.relation || '' },
       description: l.description
     }));
     const option = { 
@@ -128,7 +129,7 @@
         categories,
         force: { 
           repulsion: 1300,
-          edgeLength: [120, 220],
+          edgeLength: [150, 200], // 
           gravity: 0.06,
           friction: 0.6
         },
@@ -136,10 +137,10 @@
           show: true,
           position: 'inside',
           color: '#e8f3ee',
-          fontSize: 12,
+          fontSize: 20,   //
           backgroundColor: 'rgba(0,0,0,0)',
           padding: 0,
-          formatter: (p) => p.data.name || p.data.id || ''
+          formatter: (p) => p.data.name || '' 
         },
         emphasis: {
           focus: 'adjacency',
@@ -153,21 +154,21 @@
           opacity: 0.9           
         },
         lineStyle: { 
-          width: 1.2,   
+          width: 5,   //
           opacity: 0.35,
-          curveness: 0.20
+          curveness: 0.4   //
         },
         category: {
           label: { 
             color: '#ffffff',
-            fontSize: 18,
+            fontSize: 100,  //
             fontWeight: 'bold'
           }
         },
         edgeLabel: {
           show: true,
           formatter: (p) => p.data?.relation || '',
-          fontSize: 10,
+          fontSize: 20,
           color: 'rgba(232,243,238,0.55)',
           backgroundColor: 'transparent',
           padding: 0,
@@ -177,26 +178,8 @@
       }]
     };
   
+  
     myChart.setOption(option);
-    // 根据缩放动态调字（不隐藏，只缩放）
-    myChart.off('graphRoam');
-    myChart.on('graphRoam', (params) => {
-      const zoom = params.zoom ?? 1;
-
-      const nodeBase = 12;
-      const edgeBase = 11;
-
-      // 按 zoom 缩放字号，限制范围，避免太大或太小
-      const nodeFont = Math.max(9, Math.min(16, Math.round(nodeBase * zoom)));
-      const edgeFont = Math.max(8, Math.min(14, Math.round(edgeBase * zoom)));
-
-      myChart.setOption({
-        series: [{
-          label: { fontSize: nodeFont, distance: Math.max(4, Math.round(6 * zoom)) },
-          edgeLabel: { fontSize: edgeFont }
-        }]
-      }, { notMerge: false, lazyUpdate: true });
-    });
 
     myChart.off('click');
     myChart.on('click', params => {
@@ -213,17 +196,14 @@
     title.textContent = node.name || node.id;
     panel.appendChild(title);
     const details = document.createElement('div');
-    details.innerHTML =
-      `<b>ID:</b> ${node.id || ''}<br/>` +
-      `<b>学科:</b> ${node.discipline || ''}<br/>` +
-      `<b>值:</b> ${node.value || ''}`;
+    details.innerHTML = `<b>ID:</b> ${node.id || ''}<br/><b>学科:</b> ${node.category || ''}<br/><b>值:</b> ${node.value || ''}`;
     panel.appendChild(details);
   }
 
   async function loadSample() {
     try {
       setInfo('正在加载本地样例...');
-      const res = await fetch('../static/json/sample_data.json');
+      const res = await fetch('/frontend/static/json/sample_data.json');
       if (!res.ok) throw new Error('样例文件未找到');
       const data = await res.json();
       renderGraph(data);

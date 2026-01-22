@@ -1,7 +1,10 @@
-import pymongo
-client = pymongo.MongoClient("mongodb://ecnu10235501426:ECNU10235501426@dds-uf6800965d405e14-pub.mongodb.rds.aliyuncs.com:3717/admin")
-db = client['ecnu10235501426']
-users_col = db['users']
-result = users_col.find({}, {"_id": 0})
-print(list(result))
-
+from tinydb import TinyDB, Query
+db = TinyDB("db.json")
+users_col = db.table("cloud_final")
+doc = next((d for d in users_col.all() if "total_tokens" in d and "total_counts" in d), None)
+if doc:
+    doc["total_tokens"] += 100
+    doc["total_counts"] += 100
+    users_col.update(doc, doc_ids=[doc.doc_id])
+result = users_col.all()
+print(result)

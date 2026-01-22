@@ -12,11 +12,7 @@ from .lib.sanitize import (
 )
 from .lib.quality import content_check
 
-BASE_URL = "https://ark.cn-beijing.volces.com/api/v3"
-
-# 环境变量优先
-API_KEY = os.getenv("VOLC_ARK_API_KEY", "1f0dfbb6-494f-4378-9662-37d0d563891a")
-MODEL_ID = os.getenv("VOLC_ARK_MODEL", "ep-20260117135142-6pp26")
+from config import API_KEY, MODEL_ID, BASE_URL
 
 # 规模限制
 MAX_NODES = 30

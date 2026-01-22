@@ -4,14 +4,15 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import Response
 from backend.models.llm_graph_builder import build_knowledge_graph
+from backend.models.chat import llm_chat
 from backend.models.bloom_filter import BloomFilter
-from pymongo import MongoClient    
+from pymongo import MongoClient   
+from tinydb import TinyDB, Query 
 import asyncio
 import os
 import time
 
 app = FastAPI()
-mongodb_client = None
 users_col = None
 templates = Jinja2Templates(directory="frontend/templates")
 app.mount("/frontend/static", StaticFiles(directory="frontend/static"), name="frontend/static")
@@ -20,34 +21,17 @@ bf = BloomFilter(expected_elements=100, false_positive_rate=0.001)
 # 开关服务器
 @app.on_event("startup")
 async def startup_event():
-    global mongodb_client, users_col
+    global users_col
     while True:
         try:
-            mongodb_client = MongoClient(
-                "mongodb://ecnu10235501426:ECNU10235501426@dds-uf6800965d405e14-pub.mongodb.rds.aliyuncs.com:3717/admin",
-                serverSelectionTimeoutMS=10000,
-                connectTimeoutMS=10000,
-            )
-            db = mongodb_client['ecnu10235501426']
-            users_col = db['users']
-            await asyncio.to_thread(users_col.delete_many, {})
-            await asyncio.to_thread(
-                users_col.insert_one, 
-                {
-                    "total_tokens": 50,
-                    "total_counts": 250
-                }
-            )
-
-            # 删除所有索引
-            indexes = await asyncio.to_thread(users_col.list_indexes)
-            for idx in indexes:
-                if idx["name"] != "_id_":
-                    await asyncio.to_thread(users_col.drop_index, idx["name"])
-            
-            # 给name建非唯一索引
-            await asyncio.to_thread(users_col.create_index, "name")
-            
+            db = TinyDB("db.json")
+            users_col = db.table("cloud_final")
+            users_col.truncate()
+            users_col.insert({
+                "total_tokens": 50,
+                "total_counts": 250
+            })
+             
             print(f"进程 {os.getpid()} 的 MongoDB 初始化成功")
             break
         except Exception as e:
@@ -56,9 +40,7 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    if mongodb_client:
-        await asyncio.to_thread(mongodb_client.close)
-        print(f"进程 {os.getpid()} 的MongoDB 连接已关闭")
+    pass
 
 # 功能路由
 @app.post("/api/graph")
@@ -76,33 +58,26 @@ async def build_graph(request: Request):
         print("start")
         start = time.time()
         if bf.contains(concept):
-            doct = dict(await asyncio.to_thread(
-                lambda: users_col.find_one({"concept": concept}, {"_id": 0})  
-            ))
-            original_data = doct["graph"]
+            User = Query()
+            doc = users_col.get(User.concept == concept)
+            original_data = doc["graph"]
+            # print(original_data)
             print("Bloom Filter 热查询命中")
         else: 
             original_data = await asyncio.to_thread(build_knowledge_graph, concept)
-            await asyncio.to_thread(users_col.insert_one, {"concept": concept, "graph": original_data})
+            users_col.insert({"concept": concept, "graph": original_data})
             bf.add(concept)
         end = time.time()
         print("end")
         print(f"{end-start}")
         
-        await asyncio.to_thread(
-            users_col.update_one, 
-            {
-                "total_tokens": {"$exists": True},
-                "total_counts": {"$exists": True},
-                "$expr": {"$eq": [{"$size": {"$objectToArray": "$$ROOT"}}, 3]}
-            }, 
-            {
-                "$inc": {
-                    "total_tokens": int(original_data.get("tokens", 0)/1000), 
-                    "total_counts": 1
-                }
-            }
-        )
+        add_tokens = int(original_data.get("tokens", 0)/1000)
+        add_counts = 1
+        doc = next((d for d in users_col.all() if "total_tokens" in d and "total_counts" in d), None)
+        if doc:
+            doc["total_tokens"] += add_tokens
+            doc["total_counts"] += add_counts
+            users_col.update(doc, doc_ids=[doc.doc_id])
         
         nodes=[]
         links=[]
@@ -118,12 +93,34 @@ async def build_graph(request: Request):
     except Exception as e:
         return {"error": str(e), "nodes": [], "links": []}
 
+@app.post("/api/chat")
+async def chat(request: Request):
+    try:
+        data = await request.json()
+        message = (data.get("message") or "").strip()
+        history = data.get("history") or []
+        
+        reply_text, usage = await asyncio.to_thread(llm_chat, message, history)
+
+        add_tokens = int(usage.get("total_tokens", 0)/1000)
+        add_counts = 1
+        doc = next((d for d in users_col.all() if "total_tokens" in d and "total_counts" in d), None)
+        if doc:
+            doc["total_tokens"] += add_tokens
+            doc["total_counts"] += add_counts
+            users_col.update(doc, doc_ids=[doc.doc_id])
+        
+        return {"reply": reply_text, "usage": usage}
+
+    except Exception as e:
+        return {"error": str(e), "reply": ""}
+
 @app.post("/api/counts_and_tokens")
 async def counts_and_tokens(request: Request):
     try:
-        docs = dict(await asyncio.to_thread(
-            lambda: users_col.find_one({"total_tokens": {"$exists": True}, "total_counts": {"$exists": True}}, {"_id": 0})  
-        ))
+        doc = next((d for d in users_col.all() if "total_tokens" in d and "total_counts" in d), None)
+        docs = dict(doc) if doc else {}
+        
         return {
             "total_counts": docs.get("total_counts",0),
             "total_tokens": docs.get("total_tokens",0)
@@ -149,3 +146,7 @@ async def calculator2(request: Request):
 @app.get("/technologies.html", response_class=HTMLResponse)
 async def calculator2(request: Request):
     return templates.TemplateResponse("technologies.html", {"request": request})
+
+@app.get("/find.html", response_class=HTMLResponse)
+async def find_page(request: Request):
+    return templates.TemplateResponse("find.html", {"request": request})

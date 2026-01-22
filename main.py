@@ -5,6 +5,8 @@ import time
 import threading
 from pymongo import MongoClient
 import random 
+from tinydb import TinyDB, Query
+# from filelock import FileLock
 
 # 清理__pycache__
 def clean_pycache():
@@ -14,31 +16,25 @@ def clean_pycache():
             shutil.rmtree(pycache_path)            
 
 # 模拟其他用户在更新使用
+# db_lock = FileLock(f"db.json.lock")
 def simulation_other_users():
     while True:
-        mongodb_client = MongoClient(
-            "mongodb://ecnu10235501426:ECNU10235501426@dds-uf6800965d405e14-pub.mongodb.rds.aliyuncs.com:3717/admin",
-            serverSelectionTimeoutMS=10000,
-            connectTimeoutMS=10000,
-        )
-        db = mongodb_client['ecnu10235501426']
-        users_col = db['users']
+        db = TinyDB("db.json")
+        users_col = db.table("cloud_final")
+        
         counts = random.randint(20, 40)
-        users_col.update_one( 
-            {
-                "total_tokens": {"$exists": True},
-                "total_counts": {"$exists": True},
-                "$expr": {"$eq": [{"$size": {"$objectToArray": "$$ROOT"}}, 3]}
-            }, 
-            {
-                "$inc": {
-                    "total_tokens": int(counts * random.randint(3000, 8000) /1000), 
-                    "total_counts": counts
-                }
-        })
+        # with db_lock:
+        doc = next((d for d in users_col.all() if "total_tokens" in d and "total_counts" in d), None)
+        if doc:
+            doc["total_tokens"] += int(counts * random.randint(3000,8000)/1000)
+            doc["total_counts"] += counts
+            users_col.update(doc, doc_ids=[doc.doc_id])
         time.sleep(2)
 
 if __name__ == "__main__":
+    if os.path.exists("db.json"):
+        os.remove("db.json")
+    time.sleep(5)
     threading.Thread(target=simulation_other_users, daemon=True).start()
     uvicorn.run(
         "backend.routing.router:app",

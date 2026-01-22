@@ -8,44 +8,46 @@
 <body style="background-color: #789c8c;">
     <!-- 导航栏 -->
     <div class="nav">
-        <link type="text/css" href="../static/css/navigater.css" rel="stylesheet">
+        <link type="text/css" href="frontend/static/css/navigater.css" rel="stylesheet">
         <ul class="navlist">
             <li class="btli"><a href="index.html">项目首页</a>
                 <ul class="droplist">
                     <li><a href="index.html">项目首页</a></li>
                 </ul>
             </li>
-            <li class="btli"><a href="">可视化大屏</a>
+            <li class="btli"><a href="graph.html">可视化大屏</a>
                 <ul class="droplist">
-                    <li><a href="">绘制知识图谱</a></li>
-                    <li><a href="">知识查询</a></li>
+                    <li><a href="graph.html">绘制知识图谱</a></li>
+                    <li><a href="find.html">知识查询</a></li>
                 </ul>
             </li>
             <li class="btli"><a href="">案例展示</a>
                 <ul class="droplist">
-                    <li><a href="">神经科学&深度学习</a></li>
-                    <li><a href="">信息论熵&热力学熵</a></li>
-                    <li><a href="">最小二乘&线性回归</a></li>
+                    <li><a href="eg1.html">神经科学</a></li>
+                    <li><a href="eg2.html">广义线性回归</a></li>
+                    <li><a href="eg3.html">最小二乘</a></li>
+                    <li><a href="eg4.html">机器学习</a></li>
+                    <li><a href="eg5.html">极大似然估计</a></li>
+                    <li><a href="eg6.html">量子计算机</a></li>
                 </ul>
             </li>
             <li class="btli"><a href="">资源下载</a>
                 <ul class="droplist">
                     <li><a href="">项目压缩包</a></li>
-                    <li><a href="">数据来源</a></li>
                 </ul>
             </li>
             <li class="btli"><a href="">技术总结</a>
                 <ul class="droplist">
                     <li><a href="https://www.volcengine.com/">大模型入口</a></li>
-                    <li><a href="technologies.html">页面技术</a></li>
+                    <li><a href="https://echarts.apache.org/zh/index.html">图表工具</a></li>
                 </ul>
             </li>
         </ul>
     </div>
 
     <div id="graph" style="padding: 16px 20px; height:100%">
-        <link rel="stylesheet" href="../static/css/styles.css" />
-        <script src="../static/js_lib/echarts.min.js"></script>
+        <link rel="stylesheet" href="frontend/static/css/styles.css" />
+        <script src="frontend/static/js_lib/echarts.min.js"></script>
         <section class="controls">
             <input id="conceptInput" placeholder="输入核心概念（例如：熵）" />
             <button id="queryBtn">查询</button>
@@ -61,11 +63,12 @@
             <div id="chart" class="chart" style="height: 600px;"></div>
             <aside id="infoPanel" class="info" style="background:rgb(30, 92, 62);border-radius:6px;">点击节点查看详情</aside>
         </main>
-        <script src="../static/js/app.js"></script>
+        <script src="frontend/static/js/app.js"></script>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <script src="../static/js/app.js"></script>
+    <script src="frontend/static/js_lib/echarts.min.js"></script>
+    <script src="frontend/static/js/app.js"></script>
+
 
 </body>
 </html>
